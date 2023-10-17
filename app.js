@@ -10,7 +10,17 @@ const port = 3000;
 app.use(cors());
 
 app.get("/TIL", (req, res) => {
-  res.send(tilList);
+  const search = req.query.search.toLowerCase();
+
+  if (search) {
+    const filterList = tilList.filter(
+      (el) => el.title.toLowerCase().indexOf(search) != -1
+    );
+    console.log(filterList);
+    res.send(filterList);
+  } else {
+    res.send(tilList);
+  }
 });
 
 app.get("/project", (req, res) => {
