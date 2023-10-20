@@ -10,16 +10,16 @@ const port = 3000;
 app.use(cors());
 
 app.get("/TIL", (req, res) => {
-  const search = req.query.search.toLowerCase();
-
-  if (search) {
+  console.log(req.query.search);
+  const search = req.query.search ? req.query.search.toLowerCase() : "";
+  if (search === "") {
+    res.send(tilList);
+  } else if (search !== "") {
     const filterList = tilList.filter(
       (el) => el.title.toLowerCase().indexOf(search) != -1
     );
     console.log(filterList);
     res.send(filterList);
-  } else {
-    res.send(tilList);
   }
 });
 
