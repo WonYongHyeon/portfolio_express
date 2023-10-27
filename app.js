@@ -4,7 +4,7 @@ import { tilList } from "./data/til_list.js";
 import { projectList } from "./data/project_list.js";
 
 const app = express();
-const port = 3000;
+const port = 3002;
 
 // 모든 도메인에 대해 cors 개방
 app.use(cors());
