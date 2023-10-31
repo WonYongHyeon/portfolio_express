@@ -7,7 +7,8 @@ const app = express();
 const port = 3002;
 
 // 모든 도메인에 대해 cors 개방
-app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+app.use(cors());
+// app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 // app.use(cors({ credentials: true, origin: "https://yonghyeon.site" }));
 
 app.get("/TIL", (req, res) => {
