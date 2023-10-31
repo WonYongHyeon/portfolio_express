@@ -42,10 +42,10 @@ app.listen(port, () => {
 
 app.post("/TIL");
 
-app.get("/*", function (req, res) {
-  res.sendFile(path.join(__dirname, "/app.js"), function (err) {
-    if (err) {
-      res.status(500).send(err);
-    }
-  });
-});
+// app.get("/*", function (req, res) {
+//   res.sendFile(path.join(__dirname, "/app.js"), function (err) {
+//     if (err) {
+//       res.status(500).send(err);
+//     }
+//   });
+// });
