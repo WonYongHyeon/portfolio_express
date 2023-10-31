@@ -11,15 +11,15 @@ const port = 3002;
 app.use(cors());
 
 // 새로고침 시 Cannot Get 오류 방지
-app.use(
-  createProxyMiddleware(["/project", "/skill", "/til"], {
-    target: "http://localhost:3000",
-    changeOrigin: true,
-  })
-);
+// app.use(
+//   createProxyMiddleware("/project", {
+//     target: "http://localhost:3002",
+//     changeOrigin: true,
+//     ws: true,
+//   })
+// );
 
 app.get("/TIL", (req, res) => {
-  console.log(req.query.search);
   const search = req.query.search ? req.query.search.toLowerCase() : "";
   const page = req.query.page ? req.query.page : 1;
   if (search === "") {
@@ -28,7 +28,6 @@ app.get("/TIL", (req, res) => {
     const filterList = tilList.filter(
       (el) => el.title.toLowerCase().indexOf(search) != -1
     );
-    console.log(filterList);
     res.send(filterList);
   }
 });
@@ -41,4 +40,4 @@ app.listen(port, () => {
   console.log(`서버 실행, http://localhost:${port}`);
 });
 
-app.post("/til");
+app.post("/TIL");
