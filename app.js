@@ -11,13 +11,13 @@ const port = 3002;
 app.use(cors());
 
 // 새로고침 시 Cannot Get 오류 방지
-// app.use(
-//   createProxyMiddleware("/project", {
-//     target: "http://localhost:3002",
-//     changeOrigin: true,
-//     ws: true,
-//   })
-// );
+app.use(
+  createProxyMiddleware("/project", {
+    target: "http://localhost:3002",
+    changeOrigin: true,
+    ws: true,
+  })
+);
 
 app.get("/TIL", (req, res) => {
   const search = req.query.search ? req.query.search.toLowerCase() : "";
