@@ -12,7 +12,7 @@ app.use(cors());
 
 // 새로고침 시 Cannot Get 오류 방지
 app.use(
-  createProxyMiddleware(["/project", "/skill", "til"], {
+  createProxyMiddleware(["/project", "/skill", "/til"], {
     target: "http://localhost:3000",
     changeOrigin: true,
   })
