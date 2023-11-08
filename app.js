@@ -3,6 +3,33 @@ import cors from "cors";
 import { tilList } from "./data/til_list.js";
 import { projectList } from "./data/project_list.js";
 
+import { initializeApp, applicationDefault, cert } from "firebase-admin/app";
+import {
+  getFirestore,
+  Timestamp,
+  FieldValue,
+  Filter,
+} from "firebase-admin/firestore";
+import serviceAccount from "./portfolio-44617-firebase-adminsdk-xipqk-1034efcf46.json" assert { type: "json" };
+
+// firebase 관련 세팅
+initializeApp({
+  credential: cert(serviceAccount),
+});
+const db = getFirestore();
+
+const tilListRef = db.collection("tilList").doc("tilList");
+
+const tilListRead = async () => {
+  const snapshot = await db.collection("tilList").get();
+  console.log("aaa");
+  console.log(snapshot);
+  snapshot.forEach((doc) => {
+    console.log(doc.id, "=>", doc.data());
+  });
+};
+
+// express 관련 세팅
 const app = express();
 const port = 3002;
 
@@ -10,6 +37,17 @@ const port = 3002;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.get("/aaa", async (req, res) => {
+  tilListRead();
+  const snapshot = await db.collection("tilList").get();
+  console.log("aaa");
+  console.log(snapshot);
+  snapshot.forEach((doc) => {
+    console.log(doc.id, "=>", doc.data());
+  });
+  res.send("aaa");
+});
 
 app.get("/TIL", (req, res) => {
   const search = req.query.search ? req.query.search.toLowerCase() : "";
@@ -51,10 +89,8 @@ app.post("/TIL/registration", (req, res) => {
     title: req.body.title,
     link: req.body.url,
   };
-
   tilList.unshift(til);
-
-  console.log(til, tilList);
+  test();
 
   res.json({
     success: true,
@@ -64,3 +100,12 @@ app.post("/TIL/registration", (req, res) => {
 app.listen(port, () => {
   console.log(`서버 실행, http://localhost:${port}`);
 });
+
+// 데이터 저장
+async function test() {
+  db.collection("portfolio").doc("tilList").set({
+    order: "TIL.1",
+    title: "프론트엔드 클라이언트 AWS 배포",
+    link: "https://velog.io/@quin1392/프론트엔드-클라이언트-AWS-배포",
+  });
+}
