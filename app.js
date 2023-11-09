@@ -17,16 +17,44 @@ initializeApp({
   credential: cert(serviceAccount),
 });
 const db = getFirestore();
+const tilListRef = db.collection("tilList");
 
-const tilListRef = db.collection("tilList").doc("tilList");
+// DB에서 tilList 가져오기
+const tilListRead = async (search, page) => {
+  const snapshot = await tilListRef.get();
 
-const tilListRead = async () => {
-  const snapshot = await db.collection("tilList").get();
-  console.log("aaa");
-  console.log(snapshot);
+  let filterList = [];
+
   snapshot.forEach((doc) => {
-    console.log(doc.id, "=>", doc.data());
+    filterList.push(doc.data());
   });
+
+  // 검색어로 tilList 필터링
+  if (search !== "") {
+    filterList = filterList.filter((el) => {
+      el.title.toLowerCase().indexOf(search) != -1;
+    });
+  }
+
+  return filterList.slice((page - 1) * 10, page * 10);
+};
+
+// tilList에 추가하기
+const tilListWrite = async () => {
+  const tilListWriteRef = tilListRef.doc("tilList");
+
+  await tilListWriteRef
+    .set({
+      order: "TIL.2",
+      title: "탐욕 알고리즘(Greedy Algorithm)",
+      link: "https://velog.io/@quin1392/TIL.2-알고리즘-탐욕-알고리즘",
+    })
+    .then(() => {
+      return true;
+    })
+    .catch(() => {
+      return false;
+    });
 };
 
 // express 관련 세팅
@@ -38,34 +66,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.get("/aaa", async (req, res) => {
-  tilListRead();
-  const snapshot = await db.collection("tilList").get();
-  console.log("aaa");
-  console.log(snapshot);
-  snapshot.forEach((doc) => {
-    console.log(doc.id, "=>", doc.data());
-  });
-  res.send("aaa");
-});
-
-app.get("/TIL", (req, res) => {
+app.get("/TIL", async (req, res) => {
   const search = req.query.search ? req.query.search.toLowerCase() : "";
   const page = req.query.page ? req.query.page : 1;
 
   // 검색어로 배열 필터링
-  let filterList = [];
-  if (search === "") {
-    filterList = tilList;
-  } else if (search !== "") {
-    filterList = tilList.filter(
-      (el) => el.title.toLowerCase().indexOf(search) != -1
-    );
-  }
-  // 필터링 된 배열 길이로 page 수 전송
-  const pageLength = Math.ceil(filterList.length / 10);
-  // 필터링 된 배열로 page 구분 후 전송
-  const sliceList = filterList.slice((page - 1) * 10, page * 10);
+  const sliceList = await tilListRead(search, page);
+  const pageLength = Math.ceil(sliceList.length / 10);
 
   res.json({ pageLength: pageLength, tilList: sliceList });
 });
