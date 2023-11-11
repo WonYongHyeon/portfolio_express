@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import { tilList } from "./data/til_list.js";
 import { projectList } from "./data/project_list.js";
 
 import { initializeApp, applicationDefault, cert } from "firebase-admin/app";
@@ -17,39 +16,57 @@ initializeApp({
   credential: cert(serviceAccount),
 });
 const db = getFirestore();
-const tilListRef = db.collection("tilList");
 
 // DB에서 tilList 가져오기
 const tilListRead = async (search, page) => {
-  const snapshot = await tilListRef.get();
+  const snapshot = await db
+    .collection("tilList")
+    .orderBy("createAt", "desc")
+    .get();
 
-  let filterList = [];
+  const tilList = [];
 
   snapshot.forEach((doc) => {
-    filterList.push(doc.data());
+    tilList.push(doc.data());
   });
 
   // 검색어로 tilList 필터링
   if (search !== "") {
-    filterList = filterList.filter((el) => {
-      el.title.toLowerCase().indexOf(search) != -1;
+    const filterList = tilList.filter((el) => {
+      return el.title.toLowerCase().indexOf(search) != -1;
     });
+    return [
+      filterList.slice((page - 1) * 10, page * 10),
+      Math.ceil(filterList.length / 10),
+    ];
+  } else {
+    return [
+      tilList.slice((page - 1) * 10, page * 10),
+      Math.ceil(tilList.length / 10),
+    ];
   }
-
-  return filterList.slice((page - 1) * 10, page * 10);
 };
 
 // tilList에 추가하기
-const tilListWrite = async () => {
-  const tilListWriteRef = tilListRef.doc("tilList");
+const tilListWrite = async (til) => {
+  // tilList 전체 크기 계산
+  const snapshot = await db.collection("tilList").get();
+  let count = 0;
+  snapshot.forEach((_) => {
+    count++;
+  });
 
-  await tilListWriteRef
+  // id값 무작위로 document 생성
+  await db
+    .collection("tilList")
+    .doc("TIL." + String(count + 1))
     .set({
-      order: "TIL.2",
-      title: "탐욕 알고리즘(Greedy Algorithm)",
-      link: "https://velog.io/@quin1392/TIL.2-알고리즘-탐욕-알고리즘",
+      order: "TIL." + String(count + 1),
+      title: til.title,
+      link: til.link,
+      createAt: new Date(),
     })
-    .then(() => {
+    .then((res) => {
       return true;
     })
     .catch(() => {
@@ -71,8 +88,9 @@ app.get("/TIL", async (req, res) => {
   const page = req.query.page ? req.query.page : 1;
 
   // 검색어로 배열 필터링
-  const sliceList = await tilListRead(search, page);
-  const pageLength = Math.ceil(sliceList.length / 10);
+  const [sliceList, pageLength] = await tilListRead(search, page);
+  // const pageLength = Math.ceil(sliceList.length / 10);
+  // console.log(sliceList.length);
 
   res.json({ pageLength: pageLength, tilList: sliceList });
 });
@@ -89,15 +107,12 @@ app.post("/TIL/registration", (req, res) => {
     return;
   }
 
-  const tilListLength = tilList.length;
-
   const til = {
-    order: `TIL.` + String(tilListLength + 1),
     title: req.body.title,
     link: req.body.url,
   };
-  tilList.unshift(til);
-  test();
+
+  tilListWrite(til);
 
   res.json({
     success: true,
@@ -107,12 +122,3 @@ app.post("/TIL/registration", (req, res) => {
 app.listen(port, () => {
   console.log(`서버 실행, http://localhost:${port}`);
 });
-
-// 데이터 저장
-async function test() {
-  db.collection("portfolio").doc("tilList").set({
-    order: "TIL.1",
-    title: "프론트엔드 클라이언트 AWS 배포",
-    link: "https://velog.io/@quin1392/프론트엔드-클라이언트-AWS-배포",
-  });
-}
