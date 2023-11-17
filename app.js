@@ -51,11 +51,10 @@ app.post("/TIL/registration", (req, res) => {
     title: req.body.title,
     link: req.body.url,
   };
-
-  tilListWrite(til);
+  const result = tilListWrite(til);
 
   res.json({
-    success: true,
+    success: result,
   });
 });
 
