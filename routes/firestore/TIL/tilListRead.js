@@ -8,7 +8,8 @@ export const tilListRead = async (search, page, db) => {
   const tilList = [];
 
   snapshot.forEach((doc) => {
-    tilList.push(doc.data());
+    console.log({ id: doc.id, ...doc.data() });
+    tilList.push({ id: doc.id, ...doc.data() });
   });
 
   // 검색어로 tilList 필터링

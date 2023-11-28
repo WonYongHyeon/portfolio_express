@@ -9,10 +9,11 @@ import {
   FieldValue,
   Filter,
 } from "firebase-admin/firestore";
-import serviceAccount from "./portfolio-44617-firebase-adminsdk-xipqk-1034efcf46.json" assert { type: "json" };
+import serviceAccount from "./firestore.json" assert { type: "json" };
 
-import { tilListRead } from "./controls/firestore/TIL/tilListRead.js";
-import { tilListWrite } from "./controls/firestore/TIL/tilListWrite.js";
+import { tilListRead } from "./routes/firestore/TIL/tilListRead.js";
+import { tilListWrite } from "./routes/firestore/TIL/tilListWrite.js";
+import { tilListDelete } from "./routes/firestore/TIL/tilListDelete.js";
 
 // firebase 관련 세팅
 initializeApp({
@@ -39,6 +40,17 @@ app.get("/TIL", async (req, res) => {
   res.json({ pageLength: pageLength, tilList: sliceList });
 });
 
+app.delete("/TIL", async (req, res) => {
+  const id = req.query.id;
+  const page = req.query.page;
+
+  const [sliceList, pageLength] = await tilListDelete(id, page, db);
+
+  console.log("delete 성공");
+  console.log(sliceList, pageLength);
+  res.json({ pageLength: pageLength, tilList: sliceList });
+});
+
 app.post("/TIL/registration", (req, res) => {
   if (!req.body.title || !req.body.url) {
     res.json({
@@ -51,7 +63,7 @@ app.post("/TIL/registration", (req, res) => {
     title: req.body.title,
     link: req.body.url,
   };
-  const result = tilListWrite(til);
+  const result = tilListWrite(til, db);
 
   res.json({
     success: result,
