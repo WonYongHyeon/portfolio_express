@@ -14,6 +14,7 @@ import serviceAccount from "./firestore.json" assert { type: "json" };
 import { tilListRead } from "./routes/firestore/TIL/tilListRead.js";
 import { tilListWrite } from "./routes/firestore/TIL/tilListWrite.js";
 import { tilListDelete } from "./routes/firestore/TIL/tilListDelete.js";
+import { introduceRead } from "./routes/firestore/Introduce/introduceRead.js";
 
 // firebase 관련 세팅
 initializeApp({
@@ -29,6 +30,14 @@ const port = 3002;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.get("/", async (req, res) => {
+  const introduceData = await introduceRead(db);
+
+  console.log(introduceData);
+
+  res.json(introduceData);
+});
 
 app.get("/TIL", async (req, res) => {
   const search = req.query.search ? req.query.search.toLowerCase() : "";
@@ -46,8 +55,6 @@ app.delete("/TIL", async (req, res) => {
 
   const [sliceList, pageLength] = await tilListDelete(id, page, db);
 
-  console.log("delete 성공");
-  console.log(sliceList, pageLength);
   res.json({ pageLength: pageLength, tilList: sliceList });
 });
 
