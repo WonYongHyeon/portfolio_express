@@ -32,11 +32,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", async (req, res) => {
-  const introduceData = await introduceRead(db);
+  const [introduceData, aboutData, etcData] = await introduceRead(db);
 
   console.log(introduceData);
 
-  res.json(introduceData);
+  res.json({ introduceData, aboutData, etcData });
 });
 
 app.get("/TIL", async (req, res) => {
