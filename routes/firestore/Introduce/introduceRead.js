@@ -20,7 +20,7 @@ export const introduceRead = async (db) => {
   snapshot1Doc.forEach(async (doc) => {
     const a = await db.collection("data").doc(doc.id).collection("desc").get();
     // const aaa = snapshot1.collection("desc").get();
-    console.log(a);
+    console.log(doc.data());
     data.push({ id: doc.id, ...doc.data() });
   });
   snapshot2Doc.forEach((doc) => {
