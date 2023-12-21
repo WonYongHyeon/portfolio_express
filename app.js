@@ -2,13 +2,8 @@ import express from "express";
 import cors from "cors";
 import { projectList } from "./data/project_list.js";
 
-import { initializeApp, applicationDefault, cert } from "firebase-admin/app";
-import {
-  getFirestore,
-  Timestamp,
-  FieldValue,
-  Filter,
-} from "firebase-admin/firestore";
+import { initializeApp, cert } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
 import serviceAccount from "./firestore.json" assert { type: "json" };
 
 import { tilListRead } from "./routes/firestore/TIL/tilListRead.js";
@@ -33,8 +28,6 @@ app.use(express.urlencoded({ extended: false }));
 
 app.get("/", async (req, res) => {
   const [introduceData, aboutData, etcData] = await introduceRead(db);
-
-  console.log(introduceData);
 
   res.json({ introduceData, aboutData, etcData });
 });
