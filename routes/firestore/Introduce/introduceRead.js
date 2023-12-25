@@ -53,24 +53,70 @@ export const introduceRead = async (db) => {
     introduceIdArr.push(doc.id);
     introduceArr.push(obj);
   });
-  // desc 데이터
-  const introduceDataDescDoc = await db
-    .collection("data")
-    .doc(doc.id)
-    .collection("desc")
-    .doc("desc")
-    .get();
 
-  // desc 데이터 배열로 변경
-  const descObj = await introduceDataDescDoc.data();
-  const descArr = Object.keys(descObj).map((item) => descObj[item]);
+  //   for await (const id of introduceIdArr) {
+  //     const introduceDataDescDoc = await db
+  //       .collection("data")
+  //       .doc(id)
+  //       .collection("desc")
+  //       .doc("desc")
+  //       .get();
 
-  introduceArr.map((doc, idx) => {
+  //     introduceData.push({
+  //       ...introduceArr[idx],
+  //       desc: introduceDataDescDoc.data(),
+  //     });
+  //   }
+
+  for (let idx = 0; idx < introduceIdArr.length; idx++) {
+    const id = introduceIdArr[idx];
+
+    const introduceDataDescDoc = await db
+      .collection("data")
+      .doc(id)
+      .collection("desc")
+      .doc("desc")
+      .get();
+
+    let descArr = [];
+
+    // introduceDataDescDoc.forEach((doc) => {
+    //   descArr.push(doc.data());
+    // });
+
+    // console.log(introduceDataDescDoc.data());
+
+    const introduceDataDescObj = introduceDataDescDoc.data();
+
+    for (let objKey in introduceDataDescObj) {
+      if (introduceDataDescObj.hasOwnProperty(objKey)) {
+        descArr.push(introduceDataDescObj[objKey]);
+      }
+    }
+
     introduceData.push({
-      ...doc,
-      desc: descArr[idx],
+      ...introduceArr[idx],
+      //   desc: introduceDataDescDoc.data(),
+      desc: descArr,
     });
-  });
+  }
+
+  // desc 데이터
+  //   await introduceIdArr.map(async (id, idx) => {
+  //     const introduceDataDescDoc = await db
+  //       .collection("data")
+  //       .doc(id)
+  //       .collection("desc")
+  //       .doc("desc")
+  //       .get();
+
+  //     console.log(introduceDataDescDoc.data());
+
+  //     introduceData.push({
+  //       ...introduceArr[idx],
+  //       desc: introduceDataDescDoc.data(),
+  //     });
+  //   });
 
   snapshot2.forEach((doc) => {
     aboutData.push({ id: doc.id, ...doc.data() });
@@ -79,6 +125,8 @@ export const introduceRead = async (db) => {
   snapshot3.forEach((doc) => {
     etcData.push({ id: doc.id, ...doc.data() });
   });
+
+  //   console.log(introduceArr, introduceData);
 
   return [introduceData, aboutData, etcData];
 };
