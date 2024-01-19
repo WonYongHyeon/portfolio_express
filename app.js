@@ -26,7 +26,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.get("/", async (req, res) => {
+app.get("/", async (_, res) => {
   const [introduceData, aboutData, etcData] = await introduceRead(db);
 
   res.json({ introduceData, aboutData, etcData });
@@ -70,7 +70,7 @@ app.post("/TIL/registration", (req, res) => {
   });
 });
 
-app.get("/project", (req, res) => {
+app.get("/project", (_, res) => {
   res.send(projectList);
 });
 
