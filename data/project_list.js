@@ -25,4 +25,17 @@ export const projectList = [
 ● 기프티콘 거래 게시판 구현
 ● AWS 동적 배포`,
   },
+  {
+    category: " Portfolio",
+    title: "포트폴리오",
+    // desc: "현재 사이트",
+    skill:
+      "[프론트엔드, 백엔드] Typescript, React, Emotion, express, matter.js,",
+    done: `● 프론트엔드 서버 - React 
+● 백엔드 서버 - express
+● DB 서버 -firebase의 firestore
+● TIL 페이지 - 프론트, 백 서버, firestore 간 통신 및 REST Api 구현
+● Skill 페이지 - matter.js 구현
+● AWS 동적 배포`,
+  },
 ];
