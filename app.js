@@ -51,7 +51,7 @@ app.delete("/TIL", async (req, res) => {
   res.json({ pageLength: pageLength, tilList: sliceList });
 });
 
-app.post("/TIL/registration", (req, res) => {
+app.post("/TIL/registration", async (req, res) => {
   if (!req.body.title || !req.body.url) {
     res.json({
       success: false,
@@ -63,7 +63,8 @@ app.post("/TIL/registration", (req, res) => {
     title: req.body.title,
     link: req.body.url,
   };
-  const result = tilListWrite(til, db);
+
+  const result = await tilListWrite(til, db);
 
   res.json({
     success: result,

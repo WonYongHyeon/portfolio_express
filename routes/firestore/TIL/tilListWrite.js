@@ -1,5 +1,7 @@
 // tilList에 추가하기
 export const tilListWrite = async (til, db) => {
+  let result = false;
+
   const snapshot = await db.collection("tilList").get();
   let count = 0;
   snapshot.forEach((doc) => {
@@ -15,10 +17,12 @@ export const tilListWrite = async (til, db) => {
       link: til.link,
       createAt: new Date(),
     })
-    .then((res) => {
-      return true;
+    .then((_) => {
+      result = true;
     })
     .catch(() => {
-      return false;
+      result = false;
     });
+
+  return result;
 };
