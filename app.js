@@ -10,6 +10,7 @@ import { tilListRead } from "./routes/firestore/TIL/tilListRead.js";
 import { tilListWrite } from "./routes/firestore/TIL/tilListWrite.js";
 import { tilListDelete } from "./routes/firestore/TIL/tilListDelete.js";
 import { introduceRead } from "./routes/firestore/Introduce/introduceRead.js";
+import { createProxyMiddleware } from "http-proxy-middleware";
 
 // firebase 관련 세팅
 initializeApp({
@@ -25,6 +26,12 @@ const port = 3002;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(
+  createProxyMiddleware(["/TIL"], {
+    target: "http://localhost:3000",
+    changeOrigin: true,
+  })
+);
 
 app.get("/", async (_, res) => {
   const [introduceData, aboutData, etcData] = await introduceRead(db);
